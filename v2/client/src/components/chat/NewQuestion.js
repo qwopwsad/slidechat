@@ -42,6 +42,8 @@ export default function NewQuestion(props) {
 						id={`new-title`}
 						placeholder='Title: briefly summarize your question'
 						inputRef={titleRef}
+						onFocus={props.detectIsTyping}
+						onBlur={props.detectNotTyping}
 					/>
 				</div>
 				<div>
@@ -52,6 +54,8 @@ export default function NewQuestion(props) {
 						rows='6'
 						placeholder='Describe your question in more details'
 						inputRef={bodyRef}
+						onFocus={props.detectIsTyping}
+						onBlur={props.detectNotTyping}
 					/>
 				</div>
 				{props.drawable ? (

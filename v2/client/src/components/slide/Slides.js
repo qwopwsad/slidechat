@@ -144,11 +144,19 @@ export default function Slides(props) {
 		centerCarousel(props.pageNum - 1);
 	};
 
+	/**
+	 * go to page pageNum
+	 * @param {pageNum} int
+	 */
 	const gotoPageAndCenterCarousel = (pageNum) => {
 		props.gotoPage(pageNum);
 		centerCarousel(pageNum);
 	};
 
+	/**
+	 * set the carousel center to page pageNum
+	 * @param {pageNum} int
+	 */
 	const centerCarousel = (pageNum) => {
 		if (!props.showCarouselPanel) return;
 		const thumbnail = carousel.current.querySelector(`#thumbnail-${pageNum}`);
@@ -159,6 +167,39 @@ export default function Slides(props) {
 			behavior: 'smooth',
 		});
 	};
+
+	/**
+	 * handle key events for go to previous page or go to next page
+	 */
+	useEffect(() => {
+		const nextPage = (e) => {
+			setNextDisable(true);
+			props.gotoPage(props.pageNum + 1);
+			centerCarousel(props.pageNum + 1);
+		};
+		const prevPage = (e) => {
+			setPrevDisable(true);
+			props.gotoPage(props.pageNum - 1);
+			centerCarousel(props.pageNum - 1);
+		};
+		const centerCarousel = (pageNum) => {
+			if (!props.showCarouselPanel) return;
+			const thumbnail = carousel.current.querySelector(`#thumbnail-${pageNum}`);
+			if (!thumbnail) return;
+			carousel.current.scroll({
+				top: 0,
+				left: thumbnail.offsetLeft - carousel.current.clientWidth / 2 + 40,
+				behavior: 'smooth',
+			});
+		};
+		if (props.goPrevPage === true) {
+			prevPage();
+			props.setGoPrevPage(false);
+		} else if (props.goNextPage === true) {
+			nextPage();
+			props.setGoNextPage(false);
+		}
+	}, [props]);
 
 	const startRecording = async () => {
 		if (!navigator.mediaDevices) {

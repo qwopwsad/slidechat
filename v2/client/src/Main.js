@@ -39,6 +39,9 @@ function Main(props) {
 	const [isInstructorView, setIsInstructorView] = useState(localStorage.getItem('SlideChat_StudentView') !== '1'); // default true for null
 	const questionListRef = useRef(null);
 	const questionDetailsRef = useRef(null);
+	const [isTyping, setIsTyping] = useState(false);
+	const [goPrevPage, setGoPrevPage] = useState(false);
+	const [goNextPage, setGoNextPage] = useState(false);
 
 	const [darkTheme, setDarkTheme] = useState(document.documentElement.getAttribute('data-theme') === 'dark');
 
@@ -183,6 +186,30 @@ function Main(props) {
 		applyPage(pageNum);
 	};
 
+	/**
+	 * handle key events
+	 * @param {Event} onClick event
+	 */
+	useEffect(() => {
+		window.addEventListener('keydown', (e) => {
+			if (e.defaultPrevented || isTyping) return;
+			e = e || window.event;
+			if (e.key !== undefined) {
+				if (e.key === 'ArrowLeft') {
+					setGoPrevPage(true);
+				} else if (e.key === 'ArrowRight') {
+					setGoNextPage(true);
+				}
+			} else if (e.keyCode !== undefined) {
+				if (e.keyCode === 37) {
+					setGoPrevPage(true);
+				} else if (e.keyCode === 39) {
+					setGoNextPage(true);
+				}
+			}
+		});
+	}, [isTyping]);
+
 	const gotoQuestion = (pageNum, qid) => {
 		applyPage(pageNum);
 		setQid(qid);
@@ -227,6 +254,14 @@ function Main(props) {
 		setDrawingOverlay(false);
 	};
 
+	const detectIsTyping = (e) => {
+		setIsTyping(true);
+	};
+
+	const detectNotTyping = (e) => {
+		setIsTyping(false);
+	};
+
 	return (
 		<>
 			<AppBar
@@ -264,6 +299,11 @@ function Main(props) {
 					showCarouselPanel={showCarouselPanel}
 					record={record}
 					setRecord={setRecord}
+					isTyping={isTyping}
+					goPrevPage={goPrevPage}
+					setGoPrevPage={setGoPrevPage}
+					goNextPage={goNextPage}
+					setGoNextPage={setGoNextPage}
 				/>
 				<div className='chat-area'>
 					{qid === QUESTION_LIST ? (
@@ -289,6 +329,8 @@ function Main(props) {
 							startDrawing={startDrawing}
 							cancelDrawing={cancelDrawing}
 							canvasComponentRef={canvasComponentRef}
+							detectIsTyping={detectIsTyping}
+							detectNotTyping={detectNotTyping}
 						/>
 					) : qid === MODIFY_CHAT ? (
 						<ModifyChat sid={sid} pageNum={page} old={chatToModify} back={back} />
